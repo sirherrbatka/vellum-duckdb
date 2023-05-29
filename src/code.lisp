@@ -24,11 +24,7 @@
             (iterate
               (repeat chunk-size)
               (vellum.table:transform-row transformation)
-              (incf j))
-            (iterate
-              (declare (ignorable column-name))
-              (for (column-name . column-chunk) in result-alist)
-              (setf (fill-pointer column-chunk) 0)))))
+              (incf j)))))
     (iterate
       (for chunk-index below chunk-count)
       (duckdb-api:with-data-chunk (chunk p-result chunk-index)
