@@ -6,9 +6,10 @@
          (chunk-count (duckdb-api:result-chunk-count p-result))
          (column-count (duckdb-api:duckdb-column-count p-result))
          (result-alist
-          (loop :for column-index :below column-count
-                :collect (cons (duckdb-api:duckdb-column-name p-result column-index)
-                               (make-array 1024 :adjustable t :fill-pointer 0))))
+          (iterate
+            (for column-index below column-count)
+            (collecting (cons (duckdb-api:duckdb-column-name p-result column-index)
+                              (make-array 1024 :adjustable t :fill-pointer 0)))))
          (j 0)
          (transformation (vellum.table:transformation data-frame
                                                       (vellum:bind-row ()
@@ -20,11 +21,10 @@
                                                       :in-place t
                                                       :start 0))
          ((:flet copy-in-chunk (chunk))
-          (let ((chunk-size (nth-value 1 (duckdb::translate-chunk result-alist chunk))))
-            (iterate
-              (repeat chunk-size)
-              (vellum.table:transform-row transformation)
-              (incf j)))))
+          (iterate
+            (repeat (nth-value 1 (duckdb::translate-chunk result-alist chunk)))
+            (vellum.table:transform-row transformation)
+            (incf j))))
     (iterate
       (for chunk-index below chunk-count)
       (duckdb-api:with-data-chunk (chunk p-result chunk-index)
