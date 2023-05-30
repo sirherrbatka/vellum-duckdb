@@ -1,7 +1,7 @@
 (cl:in-package #:vellum-duckdb)
 
 
-(defun copy-into-data-frame (result data-frame)
+(defun copy-into-data-frame (result header)
   (bind ((p-result (duckdb::handle result))
          (chunk-count (duckdb-api:result-chunk-count p-result))
          (column-count (duckdb-api:duckdb-column-count p-result))
@@ -10,6 +10,9 @@
             (for column-index below column-count)
             (collecting (cons (duckdb-api:duckdb-column-name p-result column-index)
                               (make-array 1024 :adjustable t :fill-pointer 0)))))
+         (data-frame (if header
+                         (vellum:make-table :header header)
+                         (vellum:make-table :columns (mapcar #'car result-alist))))
          (j 0)
          (transformation (vellum.table:transformation data-frame
                                                       (vellum:bind-row ()
@@ -35,12 +38,12 @@
 (defmethod vellum:copy-from ((format (eql ':duckdb))
                              input
                              &rest options
-                             &key columns (header (apply #'vellum.header:make-header columns))
+                             &key (columns nil columns-bound-p)
+                               (header (if columns-bound-p (apply #'vellum.header:make-header columns) nil))
                                (parameters nil parameters-bound-p))
   (declare (ignore options))
-  (let ((data-frame (vellum:make-table :header header)))
-    (duckdb:with-statement (statement input :connection duckdb:*connection*)
-      (when parameters-bound-p
-        (duckdb:bind-parameters statement parameters))
-      (duckdb:with-execute (result statement)
-        (copy-into-data-frame result data-frame)))))
+  (duckdb:with-statement (statement input :connection duckdb:*connection*)
+    (when parameters-bound-p
+      (duckdb:bind-parameters statement parameters))
+    (duckdb:with-execute (result statement)
+      (copy-into-data-frame result header))))
