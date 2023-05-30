@@ -23,7 +23,7 @@
                                                           (setf (vellum:rr i) (aref column-chunk j))))
                                                       :in-place t
                                                       :start 0))
-         ((:flet copy-in-chunk (chunk))
+         ((:flet copy-chunk (chunk))
           (iterate
             (repeat (nth-value 1 (duckdb::translate-chunk result-alist chunk)))
             (vellum.table:transform-row transformation)
@@ -31,7 +31,7 @@
     (iterate
       (for chunk-index below chunk-count)
       (duckdb-api:with-data-chunk (chunk p-result chunk-index)
-        (copy-in-chunk chunk)))
+        (copy-chunk chunk)))
     (vellum.table:transformation-result transformation)))
 
 
