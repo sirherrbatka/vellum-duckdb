@@ -11,8 +11,14 @@
         (:duckdb-double 'double-float)
         (:duckdb-varchar 'string)
         (:duckdb-timestamp 'local-time:timestamp)
-        (:duckdb-tinyint '(signed-byte 16))
-        (:duckdb-utinyint '(unsigned-byte 16)))
+        (:duckdb-tinyint '(signed-byte 8))
+        (:duckdb-utinyint '(unsigned-byte 8))
+        (:duckdb-smallint '(signed-byte 16))
+        (:duckdb-usmallint '(unsigned-byte 16))
+        (:duckdb-boolean 'boolean)
+        (:duckdb-date 'local-time:date)
+        (:duckdb-blob 'vector)
+        (:duckdb-hugeint 'integer))
       t))
 
 
