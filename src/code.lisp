@@ -48,11 +48,7 @@
                                                           (declare (ignorable column-name))
                                                           (for i from 0 below column-count)
                                                           (for (column-name . column-chunk) in result-alist)
-                                                          (handler-case (setf (vellum:rr i) (aref column-chunk j))
-                                                            (vellum.column:column-type-error (e)
-                                                              (if (null (aref column-chunk j))
-                                                                  (setf (vellum:rr i) :null)
-                                                                  (error e))))))
+                                                          (setf (vellum:rr i) (aref column-chunk j))))
                                                       :enable-restarts nil
                                                       :wrap-errors nil
                                                       :in-place t
