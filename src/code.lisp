@@ -71,7 +71,9 @@
                              &key
                                (columns nil columns-bound-p)
                                (header (if columns-bound-p (apply #'vellum.header:make-header columns) nil))
-                               (parameters nil parameters-bound-p))
+                               (parameters nil parameters-bound-p)
+                             &aux
+                               (duckdb:*sql-null-return-value* :null))
   (declare (ignore options))
   (duckdb:with-statement (statement input :connection duckdb:*connection*)
     (when parameters-bound-p
